@@ -176,6 +176,7 @@ def portfolio(request,pk):
                                                       'sum_recent_value': sum_recent_value,
                                                       'sum_acquired_value': sum_acquired_value,})
 """
+""""
 def portfolio(request, pk):
     customer = get_object_or_404(Customer, pk=pk)
     customers = Customer.objects.filter(created_date__lte=timezone.now())
@@ -196,6 +197,32 @@ def portfolio(request, pk):
                                                        'sum_initial_stock_value': sum_initial_stock_value,
                                                         'sum_initial_shares': sum_initial_shares
      })
+"""
+def portfolio(request, pk):
+    customer = get_object_or_404(Customer, pk=pk)
+    customers = Customer.objects.filter(created_date__lte=timezone.now())
+    investments =Investment.objects.filter(customer=pk)
+    stocks = Stock.objects.filter(customer=pk)
+    sum_recent_value = Investment.objects.filter(customer=pk).aggregate(Sum('recent_value')).get('recent_value__sum', 0.00)
+    sum_acquired_value = Investment.objects.filter(customer=pk).aggregate(Sum('acquired_value')).get('acquired_value__sum', 0.00)
+#Initialize stock value
+    sum_current_value = 0
+    sum_initial_value = 0
+#Loop through and add stocks
+    for stock in stocks:
+        sum_current_value += stock.current_stock_value()
+        sum_initial_value += stock.initial_stock_value()
+
+
+
+    return render(request, 'portfolio/portfolio.html', {'customers': customers, 'investments': investments,
+                                                       'stocks': stocks,
+                                                       'sum_recent_value': sum_recent_value,
+                                                       'sum_acquired_value': sum_acquired_value,
+                                                       'sum_current_value': sum_current_value,
+                                                       'sum_initial_value': sum_initial_value,
+     })
+
 
 class CustomerList(APIView):
 
