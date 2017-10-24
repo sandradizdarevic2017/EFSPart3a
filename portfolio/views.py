@@ -20,6 +20,7 @@ def home(request):
                    {'portfolio':home})
 
 
+
 @login_required
 def customer_list(request):
     customer = Customer.objects.filter(created_date__lte=timezone.now())
